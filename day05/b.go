@@ -15,7 +15,6 @@ type idRange struct {
 }
 
 func (r *idRange) overlapsWith(other idRange) bool {
-
 	return r.lo <= other.hi && other.lo <= r.hi
 }
 
