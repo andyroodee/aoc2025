@@ -7,20 +7,19 @@ import (
 	"os"
 )
 
-func readGrid() [][]byte {
-	var grid [][]byte
+var timelines int
+var cache map[string]int
+var grid [][]byte
+
+func readGrid() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		line := scanner.Text()
 		grid = append(grid, []byte(line))
 	}
-	return grid
 }
 
-var timelines int
-var cache map[string]int
-
-func quantumSplit(grid [][]byte, row int, path string, beam int) int {
+func quantumSplit(row int, beam int) int {
 	if row >= len(grid)-1 {
 		return 1
 	}
@@ -30,7 +29,7 @@ func quantumSplit(grid [][]byte, row int, path string, beam int) int {
 			key := fmt.Sprintf("%d-%d", row+1, beam-1)
 			left, ok := cache[key]
 			if !ok {
-				left = quantumSplit(grid, row+1, path+"L", beam-1)
+				left = quantumSplit(row+1, beam-1)
 				cache[key] = left
 			}
 			d += left
@@ -39,7 +38,7 @@ func quantumSplit(grid [][]byte, row int, path string, beam int) int {
 			key := fmt.Sprintf("%d-%d", row+1, beam+1)
 			right, ok := cache[key]
 			if !ok {
-				right = quantumSplit(grid, row+1, path+"R", beam+1)
+				right = quantumSplit(row+1, beam+1)
 				cache[key] = right
 			}
 			d += right
@@ -51,19 +50,19 @@ func quantumSplit(grid [][]byte, row int, path string, beam int) int {
 	if ok {
 		return mid
 	}
-	mid = quantumSplit(grid, row+1, path, beam)
+	mid = quantumSplit(row+1, beam)
 	cache[key] = mid
 	return mid
 }
 
-func simulate(grid [][]byte) {
+func simulate() {
 	cache = make(map[string]int)
 	start := bytes.Index(grid[0], []byte{'S'})
-	timelines = quantumSplit(grid, 1, "", start)
+	timelines = quantumSplit(1, start)
 }
 
 func main() {
-	grid := readGrid()
-	simulate(grid)
+	readGrid()
+	simulate()
 	fmt.Println(timelines)
 }
