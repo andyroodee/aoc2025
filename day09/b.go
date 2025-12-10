@@ -55,6 +55,16 @@ func intMin(a, b int) int {
 	return b
 }
 
+type Rect struct {
+	minX, minY, maxX, maxY int
+}
+
+func (r Rect) contains(other Rect) bool {
+	return r.minX <= other.minX && r.minY <= other.minY && other.maxX <= r.maxX && other.maxY <= r.maxY
+}
+
+var badRects = make(map[Rect]bool)
+
 func getMaxRectangleArea() int {
 	maxArea := 0
 	for i := 0; i < len(points)-1; i++ {
@@ -70,6 +80,18 @@ func getMaxRectangleArea() int {
 				continue
 			}
 			inBounds := true
+			rect := Rect{minX, minY, maxX, maxY}
+			for k := range badRects {
+				if rect.contains(k) {
+					badRects[rect] = true
+					delete(badRects, k)
+					inBounds = false
+					break
+				}
+			}
+			if !inBounds {
+				continue
+			}
 			for y := minY; y <= maxY; y++ {
 				if !inBounds {
 					break
@@ -80,6 +102,10 @@ func getMaxRectangleArea() int {
 						break
 					}
 				}
+			}
+
+			if !inBounds {
+				badRects[rect] = true
 			}
 
 			if inBounds && area > maxArea {
