@@ -44,7 +44,6 @@ func search(m *machine, k int, n int, counts []int) {
 			if sum < m.smallest {
 				m.smallest = sum
 			}
-
 		}
 		return
 	}
